@@ -73,7 +73,7 @@ struct String* split(struct String* str, char delim) {
 	for (j = 0; j < str->length; ++j)
 		if (str->str[j] == delim)
 			++c;
-	strs = malloc(c*sizeof(struct String));
+	strs = malloc(((++c)+1)*sizeof(struct String));
 	strs[c] = empty();
 
 	for (j = 0; j < str->length; ++j) {
@@ -93,34 +93,29 @@ struct String* split(struct String* str, char delim) {
 struct String join(struct String* strs, char delim) {
 	int i = 0, j = 0, c = 0, d = 0;
 	struct String str = empty();
-	while (strs[i++].str != NULL) {
-		while (strs[i].str[j] != '\0') {
+	while (strs[i].str != NULL) {
+		while (strs[i].str[j] != '\0')
 			++j;
-		}
-		if (delim != '\0') {
+		if (delim != '\0')
 			++j;
-		}
+		++i;
 		c += j;
 		j = 0;
 	}
+	if (delim != '\0')
+		--c;
 	allocate(&str, c+1);
 
 	i = 0, j = 0;
 	while (strs[i].str != NULL) {
-		while (strs[i].str[j] != '\0') {
+		while (strs[i].str[j] != '\0')
 			str.str[d++] = strs[i].str[j++];
-		}
-
-		if (delim != '\0') {
+		if (delim != '\0' && d < c)
 			str.str[d++] = delim;
-		}
-
 		++i;
 		j = 0;
 	}
-
 	str.str[d] = '\0';
-
 	return str;
 }
 
@@ -132,13 +127,14 @@ int main(int argc, char* argv) {
 	struct String str = init("abcdefg\0");
 	struct String* strs = split(&str, 'e');
 
-	s = sizeof(strs);
-	s = 3;
-
-	for (i = 0; i < s; ++i) {
-		printf("%s\n", strs[i].str);
+	while (strs[s].str != NULL) {
+		printf("%s\n", strs[s++].str);
 	}
 
-	return 0;	
+	struct String jstr = join(strs, '!');
+	printf("%s\n", jstr.str);
+
+	return 0;
+
 }
 
